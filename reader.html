@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ livro.titulo }} | Buble Book</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {% if epub_disponivel %}<script src="https://cdn.jsdelivr.net/npm/epubjs/dist/epub.min.js"></script>{% endif %}
+</head>
+<body>
+<header class="site-header"><nav class="nav wrap"><a class="brand" href="{{ url_for('inicio') }}"><span class="brand-mark">b</span><span><strong>Buble <em>Book</em></strong><small>seu cantinho de histórias</small></span></a><div class="nav-links"><a href="{{ url_for('inicio') }}">← Catálogo</a></div></nav></header>
+<main class="wrap reader-wrap">
+  <a class="back-link" href="{{ url_for('inicio') }}">← Voltar para o catálogo</a>
+  <div class="reader-layout">
+    <div class="book-cover reader-cover cover-{{ livro.capa }}"><span class="cover-brand">BUBLE BOOK</span><span class="cover-symbol">{{ livro.simbolo }}</span><div class="cover-bottom"><h3>{{ livro.titulo }}</h3><small>{{ livro.autor }}</small></div></div>
+    <article class="reader-panel">
+      <span class="eyebrow">✿ SEU CANTINHO DE LEITURA</span><h1>{{ livro.titulo }}</h1><p class="reader-desc">{{ livro.descricao }}</p><p class="reader-meta"><strong>Autor:</strong> {{ livro.autor }} · <strong>Gênero:</strong> {{ livro.genero }}</p>
+      {% if epub_disponivel %}
+        <div class="reader-toolbar"><button id="prev" type="button">← Anterior</button><span id="page">Preparando leitura…</span><button id="next" type="button">Próxima →</button><button id="smaller" type="button">A−</button><button id="bigger" type="button">A+</button></div>
+        <div id="epub-view" class="epub-view" aria-label="Leitor de livro digital"></div>
+        <script>
+          (async function () {
+            const book = ePub({{ epub_url|tojson }});
+            const rendition = book.renderTo('epub-view', {width:'100%', height:'100%', spread:'none', flow:'paginated'});
+            let size = 100;
+            try { await rendition.display(); } catch (e) { document.getElementById('page').textContent = 'Não foi possível abrir o EPUB.'; console.error(e); }
+            rendition.on('relocated', function (loc) { const d=loc&&loc.start&&loc.start.displayed; if(d&&d.total) document.getElementById('page').textContent='Página '+d.page+' de '+d.total; });
+            document.getElementById('prev').onclick=()=>rendition.prev();
+            document.getElementById('next').onclick=()=>rendition.next();
+            document.getElementById('smaller').onclick=()=>{size=Math.max(70,size-10);rendition.themes.fontSize(size+'%');};
+            document.getElementById('bigger').onclick=()=>{size=Math.min(180,size+10);rendition.themes.fontSize(size+'%');};
+          })();
+        </script>
+      {% elif livro.epub %}
+        <div class="notice"><strong>Livro no catálogo, arquivo ainda não publicado.</strong><p>Para habilitar “Ler agora”, inclua o EPUB autorizado no projeto em <code>static/books/diario-banana-20.epub</code> e publique a atualização. O arquivo será acessível publicamente pelo site; confirme que a autorização permite a disponibilização pública online.</p></div>
+      {% else %}
+        <div class="reader-text">{% for paragrafo in livro.texto %}<p>{{ paragrafo }}</p>{% endfor %}</div><div class="notice">Esta é uma amostra fictícia criada para demonstrar o funcionamento do protótipo.</div>
+      {% endif %}
+    </article>
+  </div>
+</main>
+<footer class="footer"><strong>Buble Book</strong> · Feito com carinho para quem ama histórias.</footer>
+</body>
+</html>

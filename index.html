@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fff0f5">
+  <title>Buble Book | Seu cantinho de histórias</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<header class="site-header">
+  <nav class="nav wrap">
+    <a class="brand" href="{{ url_for('inicio') }}"><span class="brand-mark">b</span><span><strong>Buble <em>Book</em></strong><small>seu cantinho de histórias</small></span></a>
+    <div class="nav-links"><a href="{{ url_for('inicio') }}">Início</a><a href="#catalogo">Biblioteca</a><a href="#sobre">Sobre nós</a><a class="nav-cta" href="#catalogo">Explorar livros →</a></div>
+  </nav>
+</header>
+<main class="wrap">
+  <section class="hero">
+    <div class="hero-copy">
+      <span class="eyebrow">✿ UM UNIVERSO DE POSSIBILIDADES</span>
+      <h1>Sua próxima história favorita está <em>esperando por você.</em></h1>
+      <p>Entre, fique à vontade e descubra novos mundos. Cada página é um convite para imaginar, sentir e se apaixonar pela leitura.</p>
+      <div class="hero-actions"><a class="button-primary" href="#catalogo">Encontrar meu próximo livro →</a><a class="text-link" href="#sobre">Conheça a Buble Book ♡</a></div>
+      <div class="hero-notes"><span>♡ Um cantinho acolhedor</span><span>✦ Histórias para descobrir</span></div>
+    </div>
+    <div class="hero-art" aria-hidden="true"><span class="decor-star star-a">✦</span><div class="hero-book book-a"><b>✿</b><strong>Pequenos sonhos</strong></div><div class="hero-book book-b"><b>☾</b><strong>Novos mundos</strong></div><div class="hero-book book-c"><b>♡</b><strong>Boas histórias</strong></div><span class="decor-star star-b">✧</span></div>
+  </section>
+
+  <section class="section" id="catalogo">
+    <div class="section-heading"><div><span class="kicker">NOSSA ESTANTE</span><h2>Encontre sua próxima leitura ✨</h2><p>Explore a seleção da Buble Book.</p></div></div>
+    <form class="search-form" action="{{ url_for('inicio') }}" method="get">
+      <label class="search-box"><span>⌕</span><input type="search" name="q" value="{{ busca }}" placeholder="Título, autor ou gênero..." aria-label="Pesquisar livros"></label>
+      {% if categoria != 'Todas' %}<input type="hidden" name="categoria" value="{{ categoria }}">{% endif %}
+      <button class="button-primary" type="submit">Pesquisar</button>
+    </form>
+    <div class="categories">{% for cat in categorias %}<a class="pill {% if cat == categoria %}active{% endif %}" href="{{ url_for('inicio', categoria=cat if cat != 'Todas' else None, q=busca or None) }}">{{ '✿ ' if cat == 'Todas' else '' }}{{ cat }}</a>{% endfor %}</div>
+    <p class="result-count">{{ livros|length }} resultado(s) para explorar.</p>
+    {% if livros %}<div class="book-grid">
+      {% for livro in livros %}<a class="book-card" href="{{ url_for('ler_livro', slug=livro.slug) }}">
+        <div class="book-cover cover-{{ livro.capa }}"><span class="cover-brand">BUBLE BOOK</span><span class="cover-symbol">{{ livro.simbolo }}</span><div class="cover-bottom"><h3>{{ livro.titulo }}</h3><small>{{ livro.autor }}</small></div></div>
+        <div class="book-info"><span class="genre">{{ livro.genero }}</span><h3>{{ livro.titulo }}</h3><p>por {{ livro.autor }}</p><div class="card-action"><span>{% if livro.epub %}Ver disponibilidade{% else %}Conhecer história{% endif %}</span><span>♡ →</span></div></div>
+      </a>{% endfor %}
+    </div>{% else %}<div class="empty-state"><span>📚</span><h3>Não encontramos essa história...</h3><p>Tente outro título, autor ou gênero.</p><a class="button-primary" href="{{ url_for('inicio') }}">Ver todos os livros</a></div>{% endif %}
+  </section>
+
+  <section class="about" id="sobre"><div class="about-art" aria-hidden="true">📚🌷</div><div><span class="kicker">UM LUGAR PARA IMAGINAR</span><h2>Mais histórias, mais possibilidades.</h2><p>A Buble Book é um protótipo de biblioteca digital pensado para tornar a descoberta de livros simples, agradável e divertida. Explore o catálogo e escolha sua próxima aventura.</p><a class="text-link" href="#catalogo">Voltar para a biblioteca ↑</a></div></section>
+</main>
+<footer class="footer"><strong>Buble Book</strong> · Feito com carinho para quem ama histórias.<br><small>Protótipo acadêmico de biblioteca digital.</small></footer>
+</body>
+</html>
